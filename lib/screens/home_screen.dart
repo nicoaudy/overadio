@@ -1,9 +1,40 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  List stations = [];
+
+  void getRadios() async {
+    try {
+      Response response = await Dio().get(
+        'https://fr1.api.radio-browser.info/json/stations/bycountrycodeexact/ID',
+      );
+      List data = response.data;
+      List filteredList = data.where((x) {
+        return x["favicon"] != "" || x['favicon'] != null;
+      }).toList();
+      setState(() {
+        stations = filteredList;
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getRadios();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,26 +60,40 @@ class HomeScreen extends StatelessWidget {
             children: [
               Expanded(
                 child: ListView.builder(
-                  itemCount: 10,
+                  itemCount: stations.length,
                   itemBuilder: (BuildContext context, int index) {
                     return Column(
                       children: [
                         ListTile(
-                          leading: const Image(
-                            image: NetworkImage(
-                              'https://jardin-secrets.com/image.php?/12435/photo-dracaena-fragrans_krzysztof-ziarnek.jpg',
+                          leading: Container(
+                            height: 60.0,
+                            width: 60.0,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: NetworkImage(stations[index]['favicon']),
+                                fit: BoxFit.fill,
+                              ),
+                              shape: BoxShape.circle,
                             ),
                           ),
                           title: Text(
-                            "Prambors FM",
+                            stations[index]['name'],
                             style: GoogleFonts.poppins().copyWith(
-                              fontSize: 16,
+                              fontSize: 14,
+                              color: Colors.white,
+                            ),
+                          ),
+                          subtitle: Text(
+                            "${stations[index]['language']} - ${stations[index]['country']}",
+                            style: GoogleFonts.poppins().copyWith(
+                              fontSize: 12,
                               color: Colors.white,
                             ),
                           ),
                           trailing: const Icon(
-                            Icons.more_vert,
+                            Icons.play_circle_fill,
                             color: Colors.white,
+                            size: 32,
                           ),
                         ),
                         const SizedBox(height: 20),
