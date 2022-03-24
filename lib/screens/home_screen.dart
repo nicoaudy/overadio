@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,28 +13,39 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List stations = [];
+  Map<String, dynamic> selectedRadio = {};
 
   void getRadios() async {
-    try {
-      Response response = await Dio().get(
-        'https://fr1.api.radio-browser.info/json/stations/bycountrycodeexact/ID',
-      );
-      List data = response.data;
-      List filteredList = data.where((x) {
-        return x["favicon"] != "" || x['favicon'] != null;
-      }).toList();
-      setState(() {
-        stations = filteredList;
-      });
-    } catch (e) {
-      print(e);
-    }
+    Response response = await Dio().get(
+      'https://fr1.api.radio-browser.info/json/stations/bycountrycodeexact/ID',
+    );
+
+    final filtered = response.data.where((row) {
+      return row['favicon'] != '';
+    });
+
+    setState(() {
+      stations = filtered.toList();
+    });
   }
 
   @override
   void initState() {
     super.initState();
     getRadios();
+  }
+
+  Widget _loader(BuildContext context, String url) {
+    return const Center(
+      child: CupertinoActivityIndicator(color: Colors.white70),
+    );
+  }
+
+  Widget _error(BuildContext context, String url, dynamic error) {
+    return const Icon(
+      CupertinoIcons.exclamationmark_circle,
+      color: Colors.yellow,
+    );
   }
 
   @override
@@ -65,15 +77,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     return Column(
                       children: [
                         ListTile(
-                          leading: Container(
+                          leading: SizedBox(
                             height: 60.0,
                             width: 60.0,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: NetworkImage(stations[index]['favicon']),
-                                fit: BoxFit.fill,
-                              ),
-                              shape: BoxShape.circle,
+                            child: CachedNetworkImage(
+                              imageUrl: stations[index]['favicon'],
+                              placeholder: _loader,
+                              errorWidget: _error,
                             ),
                           ),
                           title: Text(
@@ -84,16 +94,21 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           subtitle: Text(
-                            "${stations[index]['language']} - ${stations[index]['country']}",
+                            "${stations[index]['state']} - ${stations[index]['country']}",
                             style: GoogleFonts.poppins().copyWith(
                               fontSize: 12,
                               color: Colors.white,
                             ),
                           ),
-                          trailing: const Icon(
-                            Icons.play_circle_fill,
-                            color: Colors.white,
-                            size: 32,
+                          trailing: IconButton(
+                            onPressed: () => setState(
+                              () => selectedRadio = stations[index],
+                            ),
+                            icon: const Icon(
+                              Icons.play_circle_fill,
+                              color: Colors.white,
+                              size: 32,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 20),
@@ -102,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 ),
               ),
-              currentPlaying(context),
+              selectedRadio.isNotEmpty ? currentPlaying(context) : Container(),
             ],
           ),
         ),
@@ -124,18 +139,24 @@ class _HomeScreenState extends State<HomeScreen> {
           topRight: Radius.circular(10),
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(14.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Image.network(
-                  'https://images.unsplash.com/photo-1556761175-129418cb2dfe?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80',
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(14.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                height: 60.0,
+                width: 60.0,
+                child: CachedNetworkImage(
+                  imageUrl: selectedRadio['favicon'],
+                  placeholder: _loader,
+                  errorWidget: _error,
                 ),
-                const SizedBox(width: 20),
-                Column(
+              ),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -147,19 +168,24 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     Text(
-                      'Prambors Radio',
-                      style: GoogleFonts.poppins()
-                          .copyWith(fontSize: 14, fontWeight: FontWeight.w600),
+                      selectedRadio['name'],
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      softWrap: false,
+                      style: GoogleFonts.poppins().copyWith(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ],
                 ),
-              ],
-            ),
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(CupertinoIcons.pause_fill),
-            )
-          ],
+              ),
+              IconButton(
+                onPressed: () => setState(() => selectedRadio = {}),
+                icon: const Icon(CupertinoIcons.pause_fill),
+              )
+            ],
+          ),
         ),
       ),
     );
