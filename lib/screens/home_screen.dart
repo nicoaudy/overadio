@@ -1,8 +1,9 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:overadio/theme.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -51,15 +52,16 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black54,
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
+        elevation: 0,
         title: Text(
           'Overadio',
           style: GoogleFonts.coustard().copyWith(
             fontSize: 38,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: headingColor,
           ),
         ),
         centerTitle: false,
@@ -90,14 +92,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             stations[index]['name'],
                             style: GoogleFonts.poppins().copyWith(
                               fontSize: 14,
-                              color: Colors.white,
+                              color: textColor,
                             ),
                           ),
                           subtitle: Text(
                             "${stations[index]['state']} - ${stations[index]['country']}",
                             style: GoogleFonts.poppins().copyWith(
                               fontSize: 12,
-                              color: Colors.white,
+                              color: secondaryColor,
                             ),
                           ),
                           trailing: IconButton(
@@ -106,8 +108,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             icon: const Icon(
                               Icons.play_circle_fill,
-                              color: Colors.white,
                               size: 32,
+                              color: textColor,
                             ),
                           ),
                         ),
@@ -130,10 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
       width: MediaQuery.of(context).size.width,
       height: 80,
       decoration: const BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(color: Colors.white, blurRadius: 10.0),
-        ],
+        color: primaryColor,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(10),
           topRight: Radius.circular(10),
@@ -164,7 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       'Playing...',
                       style: GoogleFonts.poppins().copyWith(
                         fontSize: 12,
-                        color: Colors.black38,
+                        color: textColor,
                       ),
                     ),
                     Text(
@@ -175,6 +174,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       style: GoogleFonts.poppins().copyWith(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
+                        color: textColor,
                       ),
                     ),
                   ],
@@ -182,7 +182,10 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               IconButton(
                 onPressed: () => setState(() => selectedRadio = {}),
-                icon: const Icon(CupertinoIcons.pause_fill),
+                icon: const Icon(
+                  CupertinoIcons.pause_fill,
+                  color: textColor,
+                ),
               )
             ],
           ),
