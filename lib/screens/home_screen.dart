@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -13,6 +14,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  AudioPlayer player = AudioPlayer();
   List stations = [];
   Map<String, dynamic> selectedRadio = {};
 
@@ -28,6 +30,18 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       stations = filtered.toList();
     });
+  }
+
+  void play(url) async {
+    await player.play(url);
+  }
+
+  void stop() async {
+    await player.stop();
+  }
+
+  void dispose() {
+    player.dispose();
   }
 
   @override
@@ -103,9 +117,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           trailing: IconButton(
-                            onPressed: () => setState(
-                              () => selectedRadio = stations[index],
-                            ),
+                            onPressed: () {
+                              stop();
+                              setState(() => selectedRadio = stations[index]);
+                              play(selectedRadio['url']);
+                            },
                             icon: const Icon(
                               Icons.play_circle_fill,
                               size: 32,
@@ -182,7 +198,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               IconButton(
-                onPressed: () => setState(() => selectedRadio = {}),
+                onPressed: () {
+                  setState(() => selectedRadio = {});
+                  stop();
+                },
                 icon: const Icon(
                   CupertinoIcons.pause_fill,
                   color: textColor,
