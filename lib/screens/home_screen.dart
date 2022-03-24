@@ -58,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 0,
         title: Text(
           'Overadio',
-          style: GoogleFonts.coustard().copyWith(
+          style: GoogleFonts.oswald().copyWith(
             fontSize: 38,
             fontWeight: FontWeight.bold,
             color: headingColor,
@@ -90,14 +90,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           title: Text(
                             stations[index]['name'],
-                            style: GoogleFonts.poppins().copyWith(
+                            style: GoogleFonts.roboto().copyWith(
                               fontSize: 14,
                               color: textColor,
                             ),
                           ),
                           subtitle: Text(
                             "${stations[index]['state']} - ${stations[index]['country']}",
-                            style: GoogleFonts.poppins().copyWith(
+                            style: GoogleFonts.roboto().copyWith(
                               fontSize: 12,
                               color: secondaryColor,
                             ),
@@ -161,17 +161,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     Text(
                       'Playing...',
-                      style: GoogleFonts.poppins().copyWith(
+                      style: GoogleFonts.roboto().copyWith(
                         fontSize: 12,
                         color: textColor,
                       ),
                     ),
+                    const SizedBox(height: 4),
                     Text(
                       selectedRadio['name'],
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                       softWrap: false,
-                      style: GoogleFonts.poppins().copyWith(
+                      style: GoogleFonts.roboto().copyWith(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: textColor,
